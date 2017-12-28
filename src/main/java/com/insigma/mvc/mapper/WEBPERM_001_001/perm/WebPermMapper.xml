@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.insigma.mvc.dao.WEBPERM_001_001.perm.WebPermMapper">
+    <!-- 查询列表 -->
+    <select id="getPermTreeList"  resultType="SPermission" >
+		select 
+		permissionid id ,
+		name, 
+		parentid pid
+		from 
+		s_permission 
+		order by to_number(sortnum)
+	</select>
+	
+	<!-- 通过权限id获取相关权限数据 -->
+	<select id="getPermDataById"  resultType="SPermission" parameterType="String" >
+		select 
+		    permissionid  ,
+		    name, 
+		    code,
+		    describe,
+		    parentid,
+		    url,
+		    type,
+		    (select name from s_permission t where t.permissionid=a.parentid) parentname,
+		    enabled,
+		    sortnum,
+		    updatetime,
+		    iconcss,
+		    enabled,
+		    isblanktarget  
+		    from 
+		    s_permission  a 
+		where permissionid=#{permissionid}
+	</select>
+	
+	
+	<!-- 通过代码编号获取权限相关数据 判断权限编号是否重复 -->
+	<select id="isPermCodeExist"  resultType="SPermission" parameterType="SPermission" >
+		select code from s_permission a  where code=#{code} 
+		<if test="permissionid != null and  permissionid!=''"> and a.permissionid&lt;&gt;#{permissionid}</if>
+	</select>
+	
+	
+	<!-- 通过代码编号获取权限相关数据 判断url是否重复 -->
+	<select id="isPermUrlExist"  resultType="SPermission" parameterType="SPermission" >
+		select code from s_permission a  where url=#{url} and url!='#'
+		<if test="permissionid != null and  permissionid!=''"> and a.permissionid&lt;&gt;#{permissionid}</if>
+	</select>
+	
+	<!-- 判断当前权限节点是否有子结点 -->
+	<select id="getPermListDataByParentid"  resultType="SPermission" parameterType="String" >
+		select code from s_permission a  where parentid=#{parentid}
+	</select>
+	
+	<!-- 通过权限节点删除权限相关数据 -->
+	<delete id="deletePermDataById">
+	    delete from s_permission s where s.permissionid=#{permissionid} and s.deleteable='1'
+	</delete>
+	
+	
+	<!-- 保存 -->
+	<insert id="savePermissionData"  parameterType="SPermission">
+	    <selectKey resultType="java.lang.String" order="BEFORE" keyProperty="permissionid"> 
+            SELECT sys_guid() from dual 
+        </selectKey>
+		insert into s_permission(permissionid,parentid,code,name,type,url,describe,sortnum,updatetime,iconcss,enabled,isblanktarget,deleteable)
+		values (#{permissionid},#{parentid},#{code},#{name},#{type},#{url},#{describe},#{sortnum},sysdate,#{iconcss},#{enabled},#{isblanktarget},'1')
+	</insert>
+	
+	<!-- 更新-->
+	<update id="updatePermissionData" parameterType="SPermission">
+		update s_permission t 
+		  <set>
+	      <if test="name != null  ">t.name=#{name},</if>
+	      <if test="code != null ">t.code=#{code},</if>
+	      <if test="describe != null ">t.describe=#{describe},</if>
+	      <if test="parentid != null  ">t.parentid=#{parentid},</if>
+	      <if test="type != null ">type=#{type},</if>
+	      <if test="url != null ">url=#{url},</if>
+	      <if test="sortnum != null ">sortnum=#{sortnum},</if>
+	      <if test="iconcss != null ">iconcss=#{iconcss},</if>
+	      <if test="enabled != null ">enabled=#{enabled},</if>
+	      <if test="isblanktarget != null ">isblanktarget=#{isblanktarget},</if>
+	      updatetime=sysdate 
+	    </set>
+        where t.permissionid=#{permissionid}
+	</update>
+	
+	
+	<!-- 批量删除 -->
+	<delete id="batdeletePermData"  parameterType="String" >
+       delete from s_permission where  deleteable='1' and permissionid in 
+       <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+       </foreach>
+	</delete>
+	
+</mapper>

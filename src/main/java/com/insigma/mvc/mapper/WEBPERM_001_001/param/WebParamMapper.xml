@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.insigma.mvc.dao.WEBPERM_001_001.param.WebParamMapper">
+    <!-- 列表查询 -->
+	<select id="getList" resultType="SysParam">
+	 select 
+	       paramid,
+	       paramtype,
+	       paramvalue,
+	       paramname,
+	       paramisvalid
+     from sys_param
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="getPageList"  parameterType="SysParam" resultType="SysParam">
+	 select 
+	       paramid,
+	       paramtype,
+	       paramvalue,
+	       paramname,
+	       paramisvalid
+     from SYS_param
+	</select>
+	
+	<!-- 通过参数id获取参数信息 -->
+	<select id="getParamByid"  parameterType="String" resultType="SysParam">
+	 select 
+	       paramid,
+	       paramtype,
+	       paramvalue,
+	       paramname,
+	       paramisvalid
+     from SYS_param where paramid=#{paramid}
+	</select>
+	
+	<!-- 新增参数 -->
+	<insert id="addparam" parameterType="SysParam" >
+	   insert into sys_param(
+	       paramid,
+	       paramtype,
+	       paramvalue,
+	       paramname,
+	       paramisvalid
+	   )
+	   values (
+	       #{paramid},
+	       #{paramtype},
+	       #{paramvalue},
+	       #{paramname},
+	       #{paramisvalid}
+	   )
+	</insert>
+	
+	<!-- 更新参数信息 -->
+	<update id="updateparam" parameterType="SysParam" >
+	     update  
+	        sys_param 
+	     set 
+	       paramtype=#{paramtype},
+	       paramvalue=#{paramvalue},
+	       paramname=#{paramname},
+	       paramisvalid=#{paramisvalid}
+	     where paramid=#{paramid}
+	</update>
+
+    <!-- 通过参数id删除参数信息 -->	
+	<delete id="deleteparambyid" parameterType="String">
+	     delete from SYS_param where paramid=#{paramid}
+	</delete>
+</mapper>
